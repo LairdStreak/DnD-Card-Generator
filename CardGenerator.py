@@ -1,7 +1,6 @@
 import os
 import math
 import yaml
-import sys
 import argparse
 
 from enum import Enum, IntEnum
@@ -755,65 +754,64 @@ class MonsterCard(CardGenerator):
 
 if __name__ == "__main__":
     
-    parser = argparse.ArgumentParser(description="Generate D&D cards.")
-    parser.add_argument("-t", "--type", help="What type of cards to generate",
-                        action="store", default="monster", choices=["monster"],
-                        dest="type")
-    parser.add_argument("-o", "--out", help="Output file path",
-                        action="store", default="cards.pdf", dest="output_path",
-                        metavar="output_path")
-    parser.add_argument("input", help="Path to input YAML file",
-                        action="store")
-    parser.add_argument("-f", "--fonts", help="What fonts to use when generating cards",
-                        action="store", default="free", choices=["free", "accurate"],
-                        dest="fonts")
+    # parser = argparse.ArgumentParser(description="Generate D&D cards.")
+    # parser.add_argument("-t", "--type", help="What type of cards to generate",
+    #                     action="store", default="monster", choices=["monster"],
+    #                     dest="type")
+    # parser.add_argument("-o", "--out", help="Output file path",
+    #                     action="store", default="cards.pdf", dest="output_path",
+    #                     metavar="output_path")
+    # parser.add_argument("input", help="Path to input YAML file",
+    #                     action="store")
+    # parser.add_argument("-f", "--fonts", help="What fonts to use when generating cards",
+    #                     action="store", default="free", choices=["free", "accurate"],
+    #                     dest="fonts")
+# 
+    # args = parser.parse_args()
 
-    args = parser.parse_args()
+    #fonts = None
+    # if args.fonts == "accurate":
+    #try:
+    #    fonts = AccurateFonts()
+    # except TTFError:
+    #    raise Exception("Failed to load accurate fonts, are you sure you used the correct file names?")
+    # else:
+    fonts = FreeFonts()
 
-    fonts = None
-    if args.fonts == "accurate":
-        try:
-            fonts = AccurateFonts()
-        except TTFError:
-            raise Exception("Failed to load accurate fonts, are you sure you used the correct file names?")
-    else:
-        fonts = FreeFonts()
-
-    canvas = canvas.Canvas(args.output_path,
+    canvas = canvas.Canvas("dd.pdf",
                     pagesize=(SmallCard.WIDTH*4, SmallCard.HEIGHT))
     
-    with open(args.input, 'r') as stream:
+    with open("E:\\my_dev\\DnD-Card-Generator\\example\\srd.yaml", 'r') as stream:
         try:
-            entries = yaml.load(stream)
+            entries = yaml.load(stream, Loader=yaml.FullLoader)
         except yaml.YAMLError as exc:
             print(exc)
             exit()
 
     for entry in entries:
-        if args.type == "monster":
-            card = MonsterCard(
-                entry["title"],
-                entry["subtitle"],
-                entry.get("artist", None),
-                entry["image_path"],
-                entry["armor_class"],
-                entry["max_hit_points"],
-                entry["speed"],
-                entry["strength"],
-                entry["dexterity"],
-                entry["constitution"],
-                entry["intelligence"],
-                entry["wisdom"],
-                entry["charisma"],
-                entry["challenge_rating"],
-                entry["experience_points"],
-                entry["source"],
-                entry["attributes"],
-                entry.get("abilities", None),
-                entry.get("actions", None),
-                entry.get("reactions", None),
-                fonts=fonts
-            )
+        card = MonsterCard(
+            entry["title"],
+            entry["subtitle"],
+            entry.get("artist", None),
+            entry["image_path"],
+            entry["armor_class"],
+            entry["max_hit_points"],
+            entry["speed"],
+            entry["strength"],
+            entry["dexterity"],
+            entry["constitution"],
+            entry["intelligence"],
+            entry["wisdom"],
+            entry["charisma"],
+            entry["challenge_rating"],
+            entry["experience_points"],
+            entry["source"],
+            entry["attributes"],
+            entry.get("abilities", None),
+            entry.get("actions", None),
+            entry.get("reactions", None),
+            fonts=fonts
+        )
 
         card.draw(canvas)
         canvas.showPage()
